@@ -1,0 +1,33 @@
+%%%%%%%%%%%%%%%%%%%%%%%% 
+% Dokumentinformationen %
+%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass{scrartcl}
+
+\include{header/zusammenfassung}
+
+\title{TSM\_AdvContr}
+\subtitle{Advanced Control}
+\author{L.~Schmid, H.~Diethelm, H.~Badertscher} % Do not remove any names! Initial authors stay first.
+
+
+\newcommand{\matlab}[1]{\footnotesize{(Matlab: \texttt{#1})}\normalsize{}}
+\newenvironment{aufzaehlung}[0]{
+    \begin{enumerate}\setlength{\leftmargin=0.5cm \itemsep}{1pt}\setlength{\parskip}{0pt}\setlength{\parsep}{0pt}}
+  {\end{enumerate}}      
+
+
+\begin{document}
+    \input{files/zustandsraumdarstellung.tex}
+    \input{files/regler.tex}
+    \newpage
+    \input{files/diskret.tex}
+    \input{files/ident.tex}
+    \newpage
+    \input{files/robust.tex}
+    \input{files/nonlinear.tex}
+    \newpage
+    \input{files/transformationen.tex}
+    \newpage
+    \input{files/matrizen.tex}
+    \newpage
+\end{document}
