@@ -1,243 +1,126 @@
-\section{Zustandsraumdarstellung}
-\scriptsize
-Darstellung einer Differentialgleichung $n$. Ordnung durch ein
-Differentialgleichungssystem von $n$ Gleichungen 1. Ordnung.
+\section{State Space Description}
 
-\subsection{Definition}
-\begin{tabular}{ll}
-\parbox{10cm}{
-	\includegraphics[width=10cm]{./bilder/zrd-schema.png}
-	}
-	& \parbox{8cm}{
-		$\dot{\underline{x}}(t) = {\boldsymbol A} \underline{x}(t) + {\boldsymbol B}
-		\underline{u}(t)$ \\
-		$\underline{y}(t) = {\boldsymbol C} \underline{x}(t) + {\boldsymbol D}
-		\underline{u}(t)$\\ 
-		
-		${\boldsymbol A}$: Systemmatrix ($n$ x $n$): Spalten entsprechen Ausgängen
-		der Integratoren, Zeilen Eingänge ; \\ 
-		${\boldsymbol B}$: Steuer- oder
-		Eingangsmatrix ($n$ x $m$) ``senkrecht''; \\ ${\boldsymbol C}$: Beobachtungs- oder Ausgangsmatrix ($k$ x $n$)
-		``waagrecht''; \\
-		${\boldsymbol D}$: Übergangs- oder Durchgangsmatrix ($k$ x
-		$m$)\\
-		
-		wobei $m$ der Anzahl Eingangssignale, $k$ der Anzahl Ausgangssignale \& $n$ der
-		Anzahl Zustandsgrössen (Integratoren, Ordnung) entsprechen.\\
-	}
- \end{tabular}
+\subsection{State Space Description}
 
+\begin{minipage}{10cm}
+    \begin{align*}
+        \dot{\underline{x}}(t) &= A \underline{x}(t) + B \underline{u}(t) \\
+        \underline{y}(t) &= C \underline{x}(t) + D\underline{u}(t)
+    \end{align*}
+    with the number of state variables $n$, the number of input signals $M$ and the number of output signals $P$.
+\end{minipage}
+\hspace{0.5cm}
+\begin{minipage}{8cm}
+    \centering
+    \includegraphics[width=\linewidth]{./bilder/zrd-schema.png}
+\end{minipage}
 
-\subsection{ZRD im Frequenzbereich \matlab{ss2tf}}
-$$\boldsymbol{G(s)} = \frac{\underline{Y}(s)}{\underline{U}(s)} =
-\boldsymbol{C}\left(s\boldsymbol{I_n}-\boldsymbol{A}\right)^{-1}\boldsymbol{B}+\boldsymbol{D}$$
-\\
-Die Grösse der Matrix $\boldsymbol {G(s)}$ entspricht der Grösse der
-Durchgangsmatrix $\boldsymbol D$. $\boldsymbol{I_n}$ sei die Einheitsmatrix mit
-Grösse $n$ x $n$.
+\begin{tabularx}{\linewidth}{llll}
+    $A$: & $n \times n$ & system matrix & describes the dynamics of the system. \\
+    $B$: & $n \times M$ & input matrix & describes how the input influences state variables. \\
+    $C$: & $P \times n$ & output matrix & describes how the output depends on state variables. \\
+    $D$: & $P \times M$ & feed-through matrix & describes direct coupling between $u$ and $y$. 
+\end{tabularx}
 
-\subsection{Übertragungsmatrizen}
-$$G(s)=\frac{Y(s)}{U(s)}=\frac{b_{m} s^{m} + b_{m-1} s^{m-1} +\cdots+b_{1} s 
-+ b_{0}}{s^{n} + a_{n-1} s^{n-1} + \cdots + a_{1} s + a_{0}}$$\\
-Allgemeine Formel für $m=1$ Eingang, $k=1$ Ausgang, $n=2$ Integratoren:\\
-$$G(s) = \left [ 
-\begin{array}{c c}
-C_{11}  & C_{12}\\
-\end{array}
-\right ]\cdot
-\left (
-\left [ 
-\begin{array}{cc}
- s & 0\\
-0 & s\\
-\end{array}
-\right ] -
-\left [ 
-\begin{array}{cc}
- A_{11} & A_{12}\\
- A_{21} & A_{22}\\
-\end{array}
-\right ]
-\right )^{-1}\cdot
-\left [ 
-\begin{array}{c}
- B_{11}\\
- B_{21}\\
-\end{array}
-\right ]+ D$$
-$$=  \frac{B_{11}C_{11}(s-A_{22}) + B_{11}C_{12}A_{21} +
-B_{21}C_{11}A_{12} + B_{21}C_{12}(s-A_{11})}{(s-A_{22})(s-A_{11}) - A_{12}A_{21}} + D$$
+\subsection{Input-Output Description}
+For a MIMO system with $M$ inputs and $P$ outputs, $G(s)$ is a $P \times M$ matrix of transfer functions.
+\begin{align*}
+    G(s) &= \frac{Y(s)}{U(s)} = \frac{b_{m} s^{m} + b_{m-1} s^{m-1} +\cdots+b_{1} s 
+    + b_{0}}{s^{n} + a_{n-1} s^{n-1} + \cdots + a_{1} s + a_{0}} \\
+    &= C (sI-A)^{-1} B + D
+\end{align*}
+The inversion of $G(s)$ to find a state space description is not unique.
 
+\subsubsection{Controllable Canonical Form}
+The controllable canonical form uses a slightly different I/O-description:
+\[
+    G(s) = \frac{Y(s)}{U(s)} = \frac{b_{n-1} s^{n-1} + b_{n-2} s^{n-2} +\cdots+b_{1} s 
+    + b_{0}}{s^{n} + a_{n-1} s^{n-1} + \cdots + a_{1} s + a_{0}} + d
+\]
+which corresponds to
+\begin{align*}
+    A_c &= \begin{bmatrix}
+        0 & 1 & 0 & \dots \\
+        \vdots & \ddots & \ddots & \vdots \\
+        0 & \dots & 0 & 1 \\
+        -a_0 & -a_1 & \dots & -a_{n-1}
+    \end{bmatrix} &
+    B_c &= \begin{bmatrix}
+        0 \\ \vdots \\ 0 \\ 1
+    \end{bmatrix} \\
+    C_c &= \begin{bmatrix}
+        b_0 & b_1 & \dots & b_{n-1} 
+    \end{bmatrix} &
+    D_c &= d
+\end{align*}
 
-\subsection{Stabilität}
-Wenn alle Realteile der Eigenwerte $\lambda$ der Systemmatrix ${\boldsymbol A}$
-negativ sind, ist ein LTI-System asymptotisch stabil, jedoch nicht umgekehrt:
-$\left | \lambda\boldsymbol{I} - \boldsymbol{A} \right |   =0 \rightarrow \forall~\lambda \quad\Re \{\lambda\}<0$
+\subsubsection{Observable Canonical Form}
+\begin{align*}
+    A_o &= \begin{bmatrix}
+        0 & 0 & \dots & -a_0 \\
+        1 & 0 & \dots & -a_1 \\
+        \vdots & \ddots & \ddots & \vdots \\
+        0 & \dots & 1 & -a_{n-1}
+    \end{bmatrix} &
+    B_o &= \begin{bmatrix}
+        b_0 \\ b_1 \\ \vdots \\ b_{n-1}
+    \end{bmatrix} \\
+    C_o &= \begin{bmatrix}
+        0 & \dots & 0 & 1
+    \end{bmatrix} & 
+    D_o &= d
+\end{align*}
 
-\subsection{Beobachtbar- \& Steuerbarkeit}
-\subsubsection{Steuerbarkeit \matlab{ctrb}}
-Gibt es Zustände von $\underline{x} (t)$ die nicht von den
-Eingängen $\underline{u} (t)$ beeinflusst werden? Wenn ja,
-dann ist das System nicht steuerbar!
+\subsection{Similarity Transform}
+The state space description is not unique and depends on the selection
+of the state variables in $x$.
+This allows for any \emph{similarity} transformation
+\[
+    \tilde{x}(t) = T x(t)
+\]
+which leads to
+\begin{align*}
+    \tilde{A} &= T A T^{-1} &
+    \tilde{B} &= T B & 
+    \tilde{C} &= C T^{-1} &
+    \tilde{D} &= D
+\end{align*}
 
-Wenn $rank \left[P_{c}\right] = rank \left[ \boldsymbol{B~~AB~~ A^2B~\ldots~
-A^{n-1}B} \right] = n $, dann ist das System vollständig steuerbar.
+\subsection{Minimal State Space Realization}
+A minimal state space realization contains the \emph{minimal} number of integrators.
+A transfer function $G(s)$ of order $n$ results in a state-space of order $n$, i.e.
+with $n$ integrators.
 
+\paragraph{SISO systems}The fraction is fully reduced, i.e. contains no common poles and zeros.
 
-\subsubsection{Beobachtbarkeit \matlab{obsv}}
-Gibt es Zustände $\underline{x}(t)$ die keinen Einfluss auf die Ausgänge
-$\underline{y}(t)$ haben? Wenn ja, kann man aus dem Verhalten von 
-$\underline{y}(t)$ nicht auf die Zustände $\underline{x}(t)$ schliessen!
-Das System ist nicht beobachtbar!
+\paragraph{MIMO systems}Not easily possible. Try to find realization with minimum number of integrators.
 
+\subsection{Controllability and Observability}
+A state space describtion is controllable \emph{and} observable if (and only if) it is minimal.
 
-Wenn $rank \left[P_{o}\right] = rank 
-\left[\begin{array}{c}
- C\\
- CA\\
-CA^2\\
-\vdots \\
-CA^{n-1}
-\end{array}\right]
- = n$, dann ist das System vollständig
-beobachtbar.
+\paragraph{Controllability}A pair $(A,B)$ is controllable if an input $u(t)$ can transfer any
+initial state $x(0)$ into another state $x(T)$ in finite time $T$.
+It is controllable if the eigenvalues of $A-BK$ can be placed arbitrarily, thus$P_c$ has full rank:
+\[
+    \rank(P_c) = \rank(
+        \begin{bmatrix}
+            B & AB & A^2B & \dots & A^{n-1}B
+        \end{bmatrix}
+    ) = n
+\]
 
-\subsubsection{Regelungsnormalform}
-\includegraphics[width=10cm]{./bilder/zrd-regelungsnormalform.png} \\
-\scriptsize
-$$G(s)=\frac{Y(s)}{U(s)}=\frac{b_{n-1} s^{n-1} + b_{n-2} s^{n-2} +\cdots+b_{1} s 
-+ b_{0}}{s^{n} + a_{n-1} s^{n-1} + \cdots + a_{1} s + a_{0}} + d$$\\
-\begin{eqnarray*}
-\left [ 
-\begin{array}{c}
-\dot{x}_1(t)\\
-\dot{x}_2(t)\\
-\vdots\\
-\dot{x}_{n-1}(t)\\
-\dot{x}_{n}(t)\\
-\end{array}
-\right ] &=&
-\left [ 
-\begin{array}{c c c c c}
-0 & 1 & 0 & \ldots & 0\\
-0 & 0 & 1 & \ldots & 0\\
-\vdots & \vdots & \vdots & \ddots & \vdots\\
-0 & 0 & 0 & \ldots & 1\\
--a_0 & -a_1 & -a_2 & \ldots & -a_{n-1}\\
-\end{array}
-\right ]\cdot
-\left [ 
-\begin{array}{c}
-x_1(t)\\
-x_2(t)\\
-\vdots \\
-x_{n-1}(t)\\
-x_{n}(t)\\
-\end{array}
-\right ]+
-\left [ 
-\begin{array}{c}
-0 \\
-0\\
-\vdots\\
-0\\
-1\\
-\end{array}
-\right ]\cdot
-u(t),\\
-y(t) &= &
-\left [ 
-\begin{array}{c c c c}
-b_0 & b_1 & \ldots & b_{n-1}\\
-\end{array}
-\right ] \cdot
-\left [ 
-\begin{array}{c}
-x_1(t)\\
-x_2(t)\\
-\vdots \\
-x_{n-1}(t)\\
-x_{n}(t)\\
-\end{array}
-\right ]+
-\left [ 
-\begin{array}{c}
-d \\
-\end{array}
-\right ] \cdot
-u(t).
-\end{eqnarray*}
-\normalsize
+\paragraph{Observability}A pair $(A,C)$ is observable if the initial state $x(0)$ can
+be determined from the observation of $y(t)$ given the control $u(t)$ within finite time $T$.
+It is observable, if the eigenvalues of $A-HC$ can be placed arbitrarily, thus $P_o$ has full rank:
+\[
+    \rank(P_o) = \rank(
+        \begin{bmatrix}
+            C \\ C A \\ \vdots \\ C^{n-1}
+        \end{bmatrix}
+    ) = n
+\]
 
-
-\subsubsection{Beobachtungsnormalform}
-\includegraphics[width=10cm]{./bilder/zrd-beobachtungsnormalform.png} \\
-\scriptsize
-$$G(s)=\frac{Y(s)}{U(s)}=\frac{b_{n-1} s^{n-1} + b_{n-2} s^{n-2} +\cdots+b_{1} s 
-+ b_{0}}{s^{n} + a_{n-1} s^{n-1} + \cdots + a_{1} s + a_{0}} + d$$\\
-\begin{eqnarray*}
-\left [ 
-\begin{array}{c}
-\dot{x}_1(t)\\
-\dot{x}_2(t)\\
-\vdots\\
-\dot{x}_{n-1}(t)\\
-\dot{x}_n(t)\\
-\end{array}
-\right ] &=&
-\left [ 
-\begin{array}{c c c c c}
-0 & 0 & 0 & \ldots & -a_0\\
-1 & 0 & 0 & \ldots & -a_1\\
-0 & 1 & 0 & \ldots & -a_2\\
-\vdots & \vdots &  \ddots & 0 & \vdots\\
-0 & 0 & \ldots & 1 & -a_{n-1}\\
-
-\end{array}
-\right ]\cdot
-\left [ 
-\begin{array}{c}
-x_1(t)\\
-x_2(t)\\
-\vdots \\
-x_{n-1}(t)\\
-x_{n}(t)\\
-\end{array}
-\right ]+
-\left [ 
-\begin{array}{c}
-b_0 \\
-b_1\\
-b_2\\
-\vdots\\
-b_{n-1}\\
-\end{array}
-\right ]\cdot
-u(t),\\
-y(t) &= &
-\left [ 
-\begin{array}{c c c c}
-0 & 0 & \ldots & 1\\
-\end{array}
-\right ] \cdot
-\left [ 
-\begin{array}{c}
-x_1(t)\\
-x_2(t)\\
-\vdots \\
-x_{n-1}(t)\\
-x_{n}(t)\\
-\end{array}
-\right ]+
-\left [ 
-\begin{array}{c}
-d \\
-\end{array}
-\right ] \cdot
-u(t).
-\end{eqnarray*}
-\normalsize
-%TODO: Saubere formatierung
-%TODO: scriptsize raus!
-%TODO: Similarity transform
-%TODO: stability
+\subsection{Stability}
+A system in I/O-describtion is (asymptotically) stable if all the poles have a negative real part.
+In that cae, the impulse response $g(t)$ converges to $0$.
+In state space, all eigenvalues of $A$ must have a negative real part.
