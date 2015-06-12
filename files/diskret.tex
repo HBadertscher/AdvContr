@@ -1,20 +1,116 @@
-%TODO: Discrete-time plant models
-%TODO: Modelling
-%TODO: Euler approximation
-%TODO: Bilinear transform
-%TODO: prewarping
-%TODO: sampling time
-%TODO: implementation
+%TODO: discrete-time controllers: stability
+%TODO: add digital implementation
 
-\section{Diskrete Regler}
+% % % % % % % % % % % % % % % % % % % %
+\section{Discrete-time Plant Models}
 
+\subsection{ZOH-discretization of plant models}
+Starting from a continuous-time state-space model $(A,B,C,D)$, the ZOH-discretization is derived.
+In continuous-time,
+\[
+    x(t) = \Phi(t) \cdot x(0) + \Gamma(t) \cdot u(0)
+\]
+where
+\begin{align*}
+    \Phi(t) &= \mathcal{L}^{-1} \left( (sI-A)^{-1} \right) = e^{At} &
+    & \text{and} &
+    \Gamma(t) = \int_0^t \phi(t) \cdot B \cdot dt = \mathcal{L}^{-1} \left((sI-A)^{-1} \cdot B \cdot \frac{1}{s}\right)
+\end{align*}
 
-\subsection{Transfer Functions}
-$ y(n) = \sum\limits_{k=0}^{q} b(k)x(n-k) - \sum\limits_{k=1}^{p} a(k)y(n-k) \longleftrightarrow 
-  H(z) = \dfrac{B(z)}{A(z)} = \dfrac{b_0 + b_1z^{-1} + b_2 z^{-2} + \dots +
-      b_q z^{-q}}{1 + a_1z^{-1} + a_2 z^{-2} + \dots + a_p z^{-p}} $
+For any sampling time instant, the discrete-time state-space representation is
+\begin{align*}
+    x_{k+1} &= \Phi(T_s) \cdot x_k + \Gamma(T_s) \cdot u_k \\
+    y_k &= C \cdot x_k + D \cdot u_k
+\end{align*}
 
-\begin{eqnarray*}
-x_{k+1}=F \cdot x_k + G \cdot u_k \\
-y_k = H \cdot x_k + J \cdot u_k
-\end{eqnarray*}      
+\subsection{ZOH-discretization of transfer functions}
+Given a plant model $P(s)$, the ZOH-discretization is
+\[
+    P_{ZOH}(z) = \frac{z-1}{z}\mathcal{Z}_s\left\{ \frac{P(s)}{s} \right\}
+\]
+
+% % % % % % % % % % % % % % % % % % % %
+\section{Modelling of discrete-time systems}
+A discrete transfer function is gien by
+\[
+    \frac{Y(z)}{U(z)} = \frac{b_n + b_{n-1}z^{-1}+ \dots + b_0z^{-n}}{1 + a_{n-1}z^{-1} + \dots + a_0}
+\]
+
+A discrete-time state-space representation is a matrix difference equation:
+\begin{align*}
+    x_{k+1} &= F \cdot x_k + G \cdot u_k \\
+    y_k &= H \cdot x_k + J \cdot u_k
+\end{align*}
+which can be written in a transfer function form given by
+\[
+    P_{ZOH}(z) = H \cdot (zI - F)^{-1} \cdot G + J
+\]
+
+\subsection{Properties of sampled systems}
+
+\paragraph{Causality}A transfer function with a higher degree of the numerator is \emph{noncausal}
+and is not realizable.
+
+\paragraph{Stability}The stability can be determined using the relation $z = e^{sT_s}$.
+The left-half plane in the $s$-domain corresponds to the area inside the unit circle in the $z$-domain.
+
+\paragraph{Bode plot}The Bode plot can be drawn by setting $z = e^{j \omega T_s}$.
+Above $\omega = \frac{\omega_s}{2}$, the frequency response is repeated with a period of $\omega_s$
+due to the periodicity of $e^{j \omega T_s}$.
+
+\paragraph{DC Gain}The final value of a step response, i.e. the DC gain is determined by
+$\lim_{z \to 1}(G(z))$.
+
+% % % % % % % % % % % % % % % % % % % %
+\section{Discrete-time Controllers}
+Controller discretization is basically the approximation of the integrator $\frac{1}{s}$.
+
+\subsection{Euler approximation}
+The Euler approximation uses the recursive definition of an integrator which leads to the transformation
+\begin{align*}
+    y(kT)) = y((k-1)T) + u(kT) T &&
+    \frac{1}{s} \quad \Leftrightarrow \quad \frac{T \cdot z}{z-1}
+\end{align*}
+
+\subsection{Tustin approximation (Bilinear transform)}
+When the sampling frequency is close to the system dynamics, the following transformation is used
+\[
+    s = \frac{2}{T} \cdot \frac{z - 1}{z + 1}
+\]
+This is also the most suitable discretization method for feedback controllers.
+
+\paragraph{Prewarping}
+The Tustin approximation warps the frequency response of the system.
+A frequency $\omega$ is moved to $\frac{2}{T} \cdot \tan(\frac{\omega T_s}{2})$.
+The following procedure can be used to prewarp the frequencies:
+\begin{enumerate}
+    \item Find discrete transfer function $C_{ZOH}(z)$ from continuous $C(s)$.
+    \item Prewarp frequencies by applying the inverse Tustin approximation:
+        \[
+            z = \frac{2 + T_s \cdot w}{2 - T_s \cdot w}
+        \]
+        which leads to the pseud-continuous time-domain $w$.
+    \item Design a controller $\tilde{C}(w)$ in the $w$-domain.
+    \item Apply inverse bilinear transform to $\tilde{C}_d(w)$ to obtain controller $C_d(z)$:
+        \[
+            w = \frac{2}{T_s} \cdot \frac{z - 1}{z + 1}
+        \]
+\end{enumerate}
+
+\subsection{Zero order hold discretization}
+The controller is discretized under the assumption that the input signal is created by a zero order hold.
+
+\subsection{Pole and zero matching}
+The discrete-time poles and zeros are calculated by $z = e^{s T}$.
+The discrete-time transfer function can be obtained from these poles and zeros.
+Then the gain is chosen to provide a good approximation at a desired frequency.
+This method is used when poles and zeros have to be matched exactly, e.g. in notch filters.
+
+\subsection{Sampling Time}
+Rules of thumb to determine the sampling frequency are
+\begin{align*}
+    \frac{\omega_s}{\omega_d} > 10 && \text{or} &&
+    \frac{\omega_s}{\omega_{al}} > 10
+\end{align*}
+where $\omega_d$ is the closed loop bandwidth (crossing over frequency) and $\omega_{al}$ is
+the bandwidth of the anti-aliasing filter
