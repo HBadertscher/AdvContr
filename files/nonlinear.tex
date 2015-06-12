@@ -3,14 +3,99 @@
 %TODO: describing functions
 %TODO: methods
 
-\section{Nichtlineare Regler}
+\section{Non-Linear Systems}
+Most non-linear systems can be classified in one of the following sets:
+\begin{itemize}
+    \item \textbf{Static non-linearities}: Saturation, dead zone, rate-limiter, quantization, \dots
+    \item \textbf{Hysteresis}: Multiple possible $y$-values for the same input
+    \item \textbf{Non-linear differential equations}
+\end{itemize}
 
-\subsection{Lyapunov Redesign}
+\subsection{Properties of non-linear systems}
+\begin{multicols}{2}
+\begin{itemize}
+    \item Superposition does not hold.
+    \item Commutativity does not apply
+    \item Transfer function methods fail
+    \item Possible multiple equilibrium points
+    \item Limit-cycles, bifurcation, chaos may exist
+    \item Generation of new frequencies
+\end{itemize}
+\end{multicols}
 
-Nichtlineares System: $\dot{x} = f(x) + g(x) \cdot u$
+\subsection{Stability definitions}
+\paragraph{Lyapunov Stability}
+A state trajectory is stable, if it remains within a given maximal deviation from the original trajectory.
+It is asymptotically stable, if it converges to the original trajectory.
 
-Lyapunov-Funktion V(x) mit folgenden Eigenschaften:
-\begin{enumerate}
-	\item $V(0) = 0$ und $V(x) > 0 \quad \forall x \neq 0$
-	\item $\dfrac{dV(x(t))}{dt}=\dfrac{dV(x)}{dx}\dfrac{dx(t)}{dt} \leq 0$ bedeutet Stabilität. $\dfrac{dV(x(t))}{dt} > 0$ bedeutet entweder Instabilität oder dass $V(x)$ keine geeignete Lyapunov-Funktion ist.
-\end{enumerate}
+\paragraph{Bounded Input Bounded Output (BIBO) Stability}
+A system is BIBO stable, if for zero initial conditions and for any arbitrary but bounded input
+signal, the output is also a bounded signal.
+
+\paragraph{Stability of linear systems}
+For linear systems, the location of the poles is responsible for stability.
+If all poles lie in the left half plane, the system is stable, if at least one
+pole lies in the right half plane, it is unstable.
+If one or more poles lie on the imaginary axis, the system is Lyapunov stable, but
+BIBO instable.
+
+\paragraph{Stability of non-linear systems}
+The Lyapunov stability can be determined by analyzing the poles of the linearized system.
+For determination of BIBO stability, passivity analysis or the small gain theorem have to be applied.
+
+\subsection{Stability analysis methods}
+\paragraph{Linearization around an operating point}
+Same procedure as every year, James.
+
+\paragraph{Isocline and gradient method}
+For systems of the form $\dot{x}_1 = f_1(x_1,x_2)$, $\dot{x}_2 = f_2(x_1,x_2)$, the system trajectories
+can be found by solving the differential equation for various initial conditions.
+This leads to a phase portrait, which can be analyzed.
+
+\paragraph{Lyapunov functions}
+''If the total energy is dissipated, the system must be stable.``
+A Lyapunov function represents an energy, thus
+$V(0) = 0$ and $V(x) > 0 \quad \forall x \neq 0$.
+The time derivative $\dot{V}(x(t))$ must be decreasing, i.e. $\frac{dV(t)}{dt} < 0$.
+
+It can be shown that a system is stable only if a Lyapunov function can be found.
+The difficulty is, how to find a Lyapunov function.
+
+\paragraph{Small gain theorem}
+For two systems with transfer functions $S_1$ and $S_2$, which are connected in a feedback
+loop, the closed-loop system is input-output stable, if $||S_1|| \cdot ||S_2|| < 1$
+for any norm $||\cdot||$, e.g. the infinity norm.
+
+\paragraph{Passivity analysis}
+A system is considered passive, if the energy $E$ is finite for all initial states $x(0)$.
+\[
+    E = \left. \sup_{T\leq 0}\int_0^T \langle u,y \rangle dt \right|_{x(0) = x_0}
+\]
+Passivity can be used to demonstrate that the system will be stable under specific criteria
+(though this is not necessarily the case.)
+
+\paragraph{Circle criterion}~\\
+\begin{minipage}{8.5cm}
+\begin{center}
+    \includegraphics[width=6cm]{bilder/nonlinear_circle_sys.png}
+\end{center}
+This is a generalization of the Nyquist stability criterion. 
+If the nonlinear term $\psi(y,t)$ in above system satisfies $\alpha \leq \psi(y,t) \leq \beta$,
+it is called \emph{sector bounded}.
+
+If the Nyquist curve $G(j\omega)$ doesn't penetrate the disc intersecting $-1/\alpha$ and $-1/\beta$,
+and encircles it $N_P$ times, where $N_P$ is the number of unstable poles, then
+$G(s)$ is stable.
+\end{minipage}
+\begin{minipage}{5cm}
+    \centering
+    \includegraphics[width=\linewidth]{bilder/nonlinear_sector.png}
+\end{minipage}
+\begin{minipage}{5cm}
+    \centering
+    \includegraphics[width=\linewidth]{bilder/nonlinear_circle.png}
+\end{minipage}
+
+\section{Describing Functions}
+
+\section{Non-Linear Control Methods}
