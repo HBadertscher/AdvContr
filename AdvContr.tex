@@ -17,13 +17,16 @@
   {\end{enumerate}}      
 \DeclareMathOperator{\rank}{rank}
 
+\setcounter{tocdepth}{2}
+
 \let\Re\relax
 \DeclareMathOperator{\Re}{Re}
 
-%TODO: english!
-%TODO: no script-size!
-
 \begin{document}
+
+    \maketitle
+    \tableofcontents
+    \clearpage
 
     \input{files/zustandsraumdarstellung.tex}
     \newpage
@@ -40,10 +43,5 @@
     
     \newpage
     \input{files/nonlinear.tex}
-    \newpage
-    
-    \input{files/transformationen.tex}
-    \newpage
-    \input{files/matrizen.tex}
-    \newpage
+
 \end{document}
