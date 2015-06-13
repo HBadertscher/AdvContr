@@ -96,6 +96,99 @@ $G(s)$ is stable.
     \includegraphics[width=\linewidth]{bilder/nonlinear_circle.png}
 \end{minipage}
 
-\section{Describing Functions}
+\subsection{Describing Functions}
+\begin{minipage}{10cm}
+    The describing method function is a tool to analyze static nonlinearities in a linear control loop.
+    If a system reaches a limit cycle, this oscillation leads to a base frequency which can be analyzed.
+    It assumes that subharmonic signal parts are small, and thus only looks at the base frequency.
+\end{minipage}
+\hspace{0.5cm}
+\begin{minipage}{8cm}
+    \centering
+    \includegraphics[width=\linewidth]{bilder/nonlinear_system.png}
+\end{minipage}
 
-\section{Non-Linear Control Methods}
+An input signal $e(t) = A \sin(\omega t)$ leads to the output $u_1(t) = C_1 \sin(\omega t + \varphi_1)$.
+Similarly to a  transfer function, the \emph{single-input describing function} (SIDF) is
+\[
+    N(A) = \frac{\tilde{u}_1}{\tilde{e}} = \frac{C_1}{A} e^{j\varphi_1} = \frac{a_1}{A} + j \frac{b_1}{A}
+\]
+where $a_1$ and $b_1$ are the \emph{Fourier coefficients} of the base frequency $\omega$
+and period $T$. They are calculated by
+\begin{align*}
+    a_1 = \frac{2}{T} \int_0^T u(t) \sin(\omega t) dt &&
+    b_1 = \frac{2}{T} \int_0^T u(t) \cos(\omega t) dt &&
+\end{align*}
+A table of often used describing functions is found in ??
+%TODO: add reference to table of describing functions
+
+\begin{minipage}{10cm}
+    \paragraph{Loop closure}
+    If a limit cycle exists, the loop gain is 1 with a negative feedback. i.e.
+    \[
+        P(j\omega) N(a) = -1 \qquad \Leftrightarrow \qquad P(j\omega) = -\frac{1}{N(A)}
+    \]
+    Graphically speaking, if the two curves intersect, a limit cycle condition is met.
+    A limit cycle is stable if the plot $-\frac{1}{N(A)}$ intersects $P(j\omega)$ from the right.
+    
+\end{minipage}
+\hspace{0.5cm}
+\begin{minipage}{8cm}
+    \centering
+    \includegraphics[width=6cm]{bilder/nonlinear_loopclosure.png}
+\end{minipage}
+
+%TODO: remove newpage
+\newpage
+\subsection{Non-Linear Control Methods}
+
+\paragraph{Linearization around an operating point}
+Using the Taylor series expansion, a system $\dot{x} = f(x(t),u(t))$ can be rewritten as
+\[
+    \Delta\dot{x} = A \cdot \Delta x + B \cdot \Delta u
+\]
+where $A$ and $B$ are the Jacobian matrices
+\begin{align*}
+    A = \left.\begin{bmatrix}
+        \frac{\partial f_1}{\partial x_1} & \frac{\partial f_1}{\partial x_2} & \dots & \frac{\partial f_1}{\partial x_n} \\
+        \frac{\partial f_2}{\partial x_1} & \frac{\partial f_2}{\partial x_2} & \dots & \frac{\partial f_2}{\partial x_n} \\
+        \vdots & \vdots & \ddots & \vdots \\
+        \frac{\partial f_n}{\partial x_1} & \frac{\partial f_n}{\partial x_2} & \dots & \frac{\partial f_n}{\partial x_n} \\
+    \end{bmatrix} \right|_{x_0,y_0}
+    && \text{and} &&
+    B = \left.\begin{bmatrix}
+            \frac{\partial f_1}{\partial u_1} & \frac{\partial f_1}{\partial u_2} & \dots & \frac{\partial f_1}{\partial u_n} \\
+            \frac{\partial f_2}{\partial u_1} & \frac{\partial f_2}{\partial u_2} & \dots & \frac{\partial f_2}{\partial u_n} \\
+            \vdots & \vdots & \ddots & \vdots \\
+            \frac{\partial f_n}{\partial u_1} & \frac{\partial f_n}{\partial u_2} & \dots & \frac{\partial f_n}{\partial u_n} \\
+        \end{bmatrix} \right|_{x_0,y_0}
+\end{align*}
+Now all linear techniques can be fully applied, though the operating range is limited.
+
+\paragraph{Compensation of static non-linearities}
+Some non-linearities can be compensated by using the inverse function of the non-linearity.
+This is often used for actuators and sensors.
+Important: the non-linearity must be known and must be invertible.
+
+\begin{center}
+    \includegraphics[width=12cm]{bilder/nonlinear_comp.png}
+\end{center}
+
+\paragraph{Linearization by local feedback}
+If the non-linearity is isolated, it can be controlled by a fast local loop. 
+That loop can be treated like a constant gain in a slower outer loop.
+For this an additional measurement is needed.
+The time scale difference between inner and outer loop must be large enough (5 to 10 times).
+
+\paragraph{Sliding-mode control}
+The control is divided into two phases in time: a \emph{reaching phase} where the system
+is driven into a \emph{stable} manifold.
+In the \emph{sliding phase}, the system slides along the manifold towards the equilibrium.
+
+\paragraph{Relay control}
+On-off relais force a system to oscillate in a limit cycle.
+The limit cycle can be analyzed using describing functions.
+
+\paragraph{Gain scheduling}
+If the process is highly dependent on the operating conditions, these can be measured and
+used to parametrize the controller.
